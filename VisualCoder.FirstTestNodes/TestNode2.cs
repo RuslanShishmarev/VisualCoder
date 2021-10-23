@@ -10,7 +10,7 @@ namespace VisualCoder.FirstTestNodes
         public List<NodeInput> Inputs { get; set ; }
         public NodeResult Result { get; set; }
 
-        public void Execute()
+        public void Execute(VisualCoderData context)
         {
             int result = 1;
             var inputs = Inputs.Select(inpObj => int.Parse(inpObj.ToString()));
@@ -18,6 +18,7 @@ namespace VisualCoder.FirstTestNodes
                 result *= input;
 
             Result = new NodeResult(result);
+            context.Result = result;
         }
     }
 }

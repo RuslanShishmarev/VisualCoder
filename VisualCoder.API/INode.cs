@@ -10,6 +10,6 @@ namespace VisualCoder.API
     {
         NodeResult Result { get; set; }
         List<NodeInput> Inputs { get; set; }
-        void Execute();
+        void Execute(VisualCoderData context);
     }
 }

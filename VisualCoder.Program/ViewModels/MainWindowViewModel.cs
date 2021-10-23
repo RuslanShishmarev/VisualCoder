@@ -18,8 +18,12 @@ namespace VisualCoder.Program.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
+
+        public VisualCoderData Context { get; private set; }
+
         public MainWindowViewModel()
         {
+            Context = new VisualCoderData();
             //download assambles
             //get all files from test file path
             string pathToAssemblies = "C://Users//Admin//Desktop//Programming//c#//VisualCoder//VisualCoder.FirstTestNodes";
@@ -74,7 +78,7 @@ namespace VisualCoder.Program.ViewModels
 
             INode node = (INode)myObj;
 
-            NodeItem nodeResult = new NodeItem(nodeInfo, nodeInputs, node);
+            NodeItem nodeResult = new NodeItem(nodeInfo, nodeInputs, node, Context);
 
             return nodeResult;
         }
