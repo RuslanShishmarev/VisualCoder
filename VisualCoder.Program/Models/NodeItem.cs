@@ -19,7 +19,6 @@ namespace VisualCoder.Program.Models
             _node.Inputs = Inputs;
             _node.Execute(_context);
             Result = new NodeResult(_node.Result);
-            MessageBox.Show(_node.Result.ToString());
         }
         private INode _node;
         public NodeInfo Info { get; private set; }

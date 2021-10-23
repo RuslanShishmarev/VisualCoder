@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using VisualCoder.Program.ViewModels;
 
 namespace VisualCoder.Program.Views
 {
@@ -23,6 +24,12 @@ namespace VisualCoder.Program.Views
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var vM = DataContext as MainWindowViewModel;
+            vM.AddNodeViewToPanelCommand.Execute(this.NodesPlacement);
         }
     }
 }
