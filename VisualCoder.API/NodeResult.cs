@@ -1,16 +1,15 @@
 ﻿namespace VisualCoder.API
 {
-    public struct NodeResult
+    public class NodeResult: NodeControl
     {
         public NodeResult(object result)
         {
-            Result = result;
+            Value = result;
         }
-        public object Result { get; set; }
 
         public override string ToString()
         {
-            return Result?.ToString();
+            return Value?.ToString();
         }
     }
 }

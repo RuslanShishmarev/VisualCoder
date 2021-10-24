@@ -47,8 +47,11 @@
                                     <Border.Background>
                                         <SolidColorBrush Color="LightGray"/>
                                     </Border.Background>
-                                    <TextBox Text="{Binding Path=Input}" VerticalAlignment="Center"
-                                             HorizontalAlignment="Center"/>
+                                    <Button Content="{Binding Path=InputName}" Command="{Binding}">
+                                        <Button.ToolTip>
+                                            <TextBlock Text="{Binding Path=ValueType.FullName}"/>
+                                        </Button.ToolTip>
+                                    </Button>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

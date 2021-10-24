@@ -1,15 +1,15 @@
 ﻿namespace VisualCoder.API
 {
-    public class NodeInput
+    public class NodeInput: NodeControl
     {
-        public object Input { get; set; }
         public NodeInput(object input)
         {
-            Input = input;
+            Value = input;
         }
+        public string InputName { get; set; }
         public override string ToString()
         {
-            return Input.ToString();
+            return Value.ToString();
         }
     }
 }
