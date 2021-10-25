@@ -47,7 +47,7 @@
                                     <Border.Background>
                                         <SolidColorBrush Color="LightGray"/>
                                     </Border.Background>
-                                    <Button Content="{Binding Path=InputName}" Command="{Binding}">
+                                    <Button Content="{Binding Path=Name}" Command="{Binding}">
                                         <Button.ToolTip>
                                             <TextBlock Text="{Binding Path=ValueType.FullName}"/>
                                         </Button.ToolTip>
@@ -57,10 +57,11 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <StackPanel Grid.Column="1" Orientation="Vertical"
-                                VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                        <TextBlock Text="{Binding Path=Result}" LineHeight="30" FontSize="15"/>
-                    </StackPanel>
+                    <Button Grid.Column="1" Content="{Binding Path=Name}">
+                        <Button.ToolTip>
+                            <TextBlock Text="{Binding Path=ValueType.FullName}"/>
+                        </Button.ToolTip>
+                    </Button>
                 </Grid>
             </Grid>
         </Border>

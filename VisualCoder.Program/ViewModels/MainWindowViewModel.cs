@@ -25,6 +25,9 @@ namespace VisualCoder.Program.ViewModels
 
         public VisualCoderData Context { get; private set; }
         public ObservableCollection<NodeItem> AllNodes { get; set; } = new ObservableCollection<NodeItem>();
+        public ObservableCollection<NodeItemView> AllViewNodes { get; set; } = new ObservableCollection<NodeItemView>();
+
+
 
         private NodeItem _selectedNode;
 
@@ -49,6 +52,20 @@ namespace VisualCoder.Program.ViewModels
                 RaisePropertyChanged(nameof(SelectedNodeToMove));
             }
         }
+
+        private Canvas _nodePlacement;
+
+        public Canvas NodePlacement
+        {
+            get { return _nodePlacement; }
+            set
+            {
+                _nodePlacement = value;
+                RaisePropertyChanged(nameof(NodePlacement));
+            }
+        }
+
+        private Window _mainWindow;
 
         public DelegateCommand<object> AddNodeViewToPanelCommand { get; private set; }
 
@@ -103,70 +120,93 @@ namespace VisualCoder.Program.ViewModels
             return nodeResult;
         }
 
-        private Canvas _nodePlacement;
-
-        public Canvas NodePlacement
-        {
-            get { return _nodePlacement; }
-            set 
-            { 
-                _nodePlacement = value;
-                RaisePropertyChanged(nameof(NodePlacement));
-            }
-        }
+        
 
         private void AddNodeViewToPanel(object canvasObj)
         {
             var canvas = canvasObj as Canvas;
             NodePlacement = canvas;
 
+            _mainWindow = Window.GetWindow(NodePlacement);
+
             NodeItemView nodeView = new NodeItemView();
             nodeView.DataContext = SelectedNode;
             nodeView.MouseLeftButtonDown += (s, e) =>
             {
-                MouseDownNode(s as NodeItemView);
+                MouseDownNode(s as NodeItemView, e);
             };
-            /*nodeView.MouseLeftButtonUp += (s, e) =>
+            nodeView.MouseMove += (s, e) =>
             {
-                MouseUpNode(s as NodeItemView);
-                //MouseMoveNode(e);
-            };*/
+                 MoveNode(e);
+            };
+            nodeView.MouseUp += (s, e) =>
+            {
+                StopMove();
+            };
 
-            /*nodeView.MouseMove += (s, e) => 
+            nodeView.MouseLeave += (s, e) =>
             {
-                MouseMoveNode(e);
-            };*/
+                StopMove();
+            };
 
-            NodePlacement.MouseUp += (s, e) => 
+            nodeView.MouseDoubleClick += (s, e) =>
             {
-                DropNode(e);
+                RemoveSelectedNode(s as NodeItemView);
             };
 
             canvas.Children.Add(nodeView);
             Canvas.SetTop(nodeView, 10);
             Canvas.SetLeft(nodeView, 10);
 
+            AllViewNodes.Add(nodeView);
         }
 
-        private void MouseDownNode(NodeItemView nodeItemView)
+        private void MouseDownNode(NodeItemView nodeItemView, MouseButtonEventArgs e)
         {
             SelectedNodeToMove = nodeItemView;
-            DragDrop.DoDragDrop(SelectedNodeToMove, nodeItemView, DragDropEffects.Move);
+            StartSelectedPositionPoint = e.GetPosition(SelectedNodeToMove);
         }
 
-        private void DropNode(MouseButtonEventArgs e)
+        private Point _startSelectedPositionPoint;
+        public Point StartSelectedPositionPoint
         {
-            //get mouse points
-            if(SelectedNodeToMove != null)
-            {
-                //get position for X
-
-                //var x = SelectedNodeToMove
-
-                Canvas.SetTop(SelectedNodeToMove, e.GetPosition(SelectedNodeToMove).Y);
-                Canvas.SetLeft(SelectedNodeToMove, e.GetPosition(SelectedNodeToMove).X);
+            get => _startSelectedPositionPoint; 
+            set 
+            { 
+                _startSelectedPositionPoint = value;
+                RaisePropertyChanged(nameof(StartSelectedPositionPoint));
             }
+        }
+
+
+        private void MoveNode(MouseEventArgs e)
+        {
+            if (SelectedNodeToMove != null)
+            {
+                var mouseCanvasPosition = e.GetPosition(NodePlacement);
+
+                var newY = mouseCanvasPosition.Y - StartSelectedPositionPoint.Y;
+                var newX = mouseCanvasPosition.X - StartSelectedPositionPoint.X;
+
+                Canvas.SetTop(SelectedNodeToMove, newY < 0 ? 0: newY);
+                Canvas.SetLeft(SelectedNodeToMove, newX < 0 ? 0 : newX);
+            }
+            
+        }
+        
+        private void StopMove()
+        {
             SelectedNodeToMove = null;
+        }
+
+        private void RemoveSelectedNode(NodeItemView nodeItemView)
+        {
+            if(nodeItemView != null)
+            {
+                AllViewNodes.Remove(nodeItemView);
+                NodePlacement.Children.Remove(nodeItemView);
+                SelectedNodeToMove = null;
+            }
         }
     }
 }
