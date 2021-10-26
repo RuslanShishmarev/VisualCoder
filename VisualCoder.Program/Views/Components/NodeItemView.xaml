@@ -33,21 +33,23 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="{Binding Path=Info}" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding NodeItem.Info}" TextWrapping="Wrap"/>
                 <Grid Grid.Row="1" >
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <ItemsControl ItemsSource="{Binding Path=Inputs}">
+                    <ItemsControl ItemsSource="{Binding NodeItem.Inputs}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border BorderBrush="Gray" Width="50" Height="50" Margin="2">
                                     <Border.Background>
                                         <SolidColorBrush Color="LightGray"/>
                                     </Border.Background>
-                                    <Button Content="{Binding Path=Name}" Command="{Binding}">
+                                    <Button Content="{Binding Path=Name}" Command="{Binding Path=DataContext.SetInputValueCommand,
+                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}">
                                         <Button.ToolTip>
                                             <TextBlock Text="{Binding Path=ValueType.FullName}"/>
                                         </Button.ToolTip>
@@ -55,11 +57,24 @@
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
+                        <ItemsControl.Style>
+                            <Style TargetType="ItemsControl">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding NodeItem.Inputs.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Setter Property="Width" Value="0"/>
+                                        <Setter Property="Height" Value="0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ItemsControl.Style>
                     </ItemsControl>
 
-                    <Button Grid.Column="1" Content="{Binding Path=Name}">
+                    <Button Grid.Column="1" Content="{Binding NodeItem.Result}" 
+                            Command="{Binding GetResultValueCommand}"
+                            CommandParameter="{Binding NodeItem.Result}">
                         <Button.ToolTip>
-                            <TextBlock Text="{Binding Path=ValueType.FullName}"/>
+                            <TextBlock Text="{Binding NodeItem.Result.ValueType.FullName}"/>
                         </Button.ToolTip>
                     </Button>
                 </Grid>

@@ -12,7 +12,7 @@ namespace VisualCoder.API
         public object Value { get; set; }
         public Type ValueType
         {
-            get => Value.GetType();
+            get => Value?.GetType();
         }
     }
 }

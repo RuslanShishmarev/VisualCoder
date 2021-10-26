@@ -32,6 +32,6 @@
             </ListBox>
             <Canvas Grid.Column="1" x:Name="NodesPlacement" AllowDrop="True"/>
         </Grid>
-        <Button Content="Start" Grid.Row="2" Command="{Binding}" />
+        <Button Content="Start" Grid.Row="2" Command="{Binding ExecuteCodeCommand}" />
     </Grid>
 </Window>

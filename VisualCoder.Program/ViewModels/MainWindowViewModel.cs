@@ -25,7 +25,7 @@ namespace VisualCoder.Program.ViewModels
 
         public VisualCoderData Context { get; private set; }
         public ObservableCollection<NodeItem> AllNodes { get; set; } = new ObservableCollection<NodeItem>();
-        public ObservableCollection<NodeItemView> AllViewNodes { get; set; } = new ObservableCollection<NodeItemView>();
+        public ObservableCollection<NodeItemView> AllPlacedViewNodes { get; set; } = new ObservableCollection<NodeItemView>();
 
 
 
@@ -69,10 +69,39 @@ namespace VisualCoder.Program.ViewModels
 
         public DelegateCommand<object> AddNodeViewToPanelCommand { get; private set; }
 
+        private NodeResult _selectedNodeResult;
+
+        public DelegateCommand ExecuteCodeCommand { get; private set; }
+
+        public NodeResult SelectedNodeResult
+        {
+            get => _selectedNodeResult;
+            set 
+            { 
+                _selectedNodeResult = value;
+                RaisePropertyChanged(nameof(SelectedNodeResult));
+            }
+        }
+
+        private NodeInput _selectedNodeInput;
+
+        public NodeInput SelectedNodeInput
+        {
+            get => _selectedNodeInput;
+            set
+            {
+                _selectedNodeInput = value;
+                RaisePropertyChanged(nameof(SelectedNodeInput));
+            }
+        }
+
+
         public MainWindowViewModel()
         {
             Context = new VisualCoderData();
             AddNodeViewToPanelCommand = new DelegateCommand<object> (AddNodeViewToPanel);
+
+            ExecuteCodeCommand = new DelegateCommand(ExecuteCode);
             //download assambles
             //get all files from test file path
             string pathToAssemblies = "C://Users//Admin//Desktop//Programming//c#//VisualCoder//VisualCoder.FirstTestNodes";
@@ -93,8 +122,7 @@ namespace VisualCoder.Program.ViewModels
 
                         string classPath = nodeInfo.PathExecuteClass;
 
-                        List<NodeInput> nodeInputs = new List<int>() { 5, 6, 540 }.Select(t => new NodeInput(t)).ToList();
-                        var node = CreateNewNode(assemlyPath, classPath, nodeInfo, nodeInputs);
+                        var node = LoadNode(assemlyPath, classPath, nodeInfo);
 
                         AllNodes.Add(node);
                     }
@@ -104,10 +132,13 @@ namespace VisualCoder.Program.ViewModels
 
         
 
-        private NodeItem CreateNewNode(string assemlyPath, string classPath, NodeInfo nodeInfo, List<NodeInput> nodeInputs)
+        private NodeItem LoadNode(string assemlyPath, string classPath, NodeInfo nodeInfo)
         {
             Assembly assembly = Assembly.LoadFrom(assemlyPath);
             Type myType = assembly.GetType(classPath);
+
+            var attr = myType.GetCustomAttribute(typeof(NodeIdentificationAttribute)) as NodeIdentificationAttribute;
+            nodeInfo.NodeName = attr.NodeName;
 
             ConstructorInfo info = myType.GetConstructor(Array.Empty<Type>());
 
@@ -115,7 +146,7 @@ namespace VisualCoder.Program.ViewModels
 
             INode node = (INode)myObj;
 
-            NodeItem nodeResult = new NodeItem(nodeInfo, nodeInputs, node, Context);
+            NodeItem nodeResult = new NodeItem(nodeInfo, node, Context);
 
             return nodeResult;
         }
@@ -127,10 +158,10 @@ namespace VisualCoder.Program.ViewModels
             var canvas = canvasObj as Canvas;
             NodePlacement = canvas;
 
-            _mainWindow = Window.GetWindow(NodePlacement);
+            _mainWindow ??= Window.GetWindow(NodePlacement);
 
             NodeItemView nodeView = new NodeItemView();
-            nodeView.DataContext = SelectedNode;
+            nodeView.DataContext = new NodeItemViewModel(nodeView, SelectedNode, this);
             nodeView.MouseLeftButtonDown += (s, e) =>
             {
                 MouseDownNode(s as NodeItemView, e);
@@ -158,7 +189,7 @@ namespace VisualCoder.Program.ViewModels
             Canvas.SetTop(nodeView, 10);
             Canvas.SetLeft(nodeView, 10);
 
-            AllViewNodes.Add(nodeView);
+            AllPlacedViewNodes.Add(nodeView);
         }
 
         private void MouseDownNode(NodeItemView nodeItemView, MouseButtonEventArgs e)
@@ -203,10 +234,17 @@ namespace VisualCoder.Program.ViewModels
         {
             if(nodeItemView != null)
             {
-                AllViewNodes.Remove(nodeItemView);
+                AllPlacedViewNodes.Remove(nodeItemView);
                 NodePlacement.Children.Remove(nodeItemView);
                 SelectedNodeToMove = null;
             }
+        }
+
+        private void ExecuteCode()
+        {
+            var lastNode = AllPlacedViewNodes.FirstOrDefault();
+            lastNode.Node.Command.Execute();
+            MessageBox.Show(lastNode.Node.Result.Value.ToString());
         }
     }
 }

@@ -24,9 +24,10 @@ namespace VisualCoder.Program.Models
         public NodeInfo Info { get; private set; }
         public NodeResult Result { get; private set; }
         public List<NodeInput> Inputs { get; set; }
-        public NodeItem(NodeInfo info, List<NodeInput> inputs, INode node, VisualCoderData context)
+        public NodeItem(NodeInfo info, INode node, VisualCoderData context)
         {
-            Inputs = inputs;
+            Inputs = node.Inputs;
+            Result = node.Result;
             Info = info;
             _node = node;
             _context = context;
