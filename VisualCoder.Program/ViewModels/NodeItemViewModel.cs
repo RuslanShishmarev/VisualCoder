@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 using Prism.Commands;
 using Prism.Mvvm;
 using VisualCoder.API;
@@ -39,6 +40,30 @@ namespace VisualCoder.Program.ViewModels
         }
 
         private MainWindowViewModel _mainContext;
+
+
+        private List<Line> _linesToInputs;
+        public List<Line> LinesToInputs
+        {
+            get => _linesToInputs;
+            set 
+            { 
+                _linesToInputs = value;
+                RaisePropertyChanged(nameof(LinesToInputs));
+            }
+        }
+
+        private Line _lineFromResult;
+        public Line LineFromResult
+        {
+            get => _lineFromResult;
+            set
+            {
+                _lineFromResult = value;
+                RaisePropertyChanged(nameof(LineFromResult));
+            }
+        }
+
 
         public NodeItemViewModel(NodeItemView nodeItemView, NodeItem nodeItem, MainWindowViewModel mainContext)
         {

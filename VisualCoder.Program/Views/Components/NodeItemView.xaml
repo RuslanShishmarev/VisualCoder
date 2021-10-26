@@ -24,6 +24,18 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        
+        <Style TargetType="Border" x:Key="inputBorder">
+            <Setter Property="Background" Value="LightGray"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+        </Style>
+        <Style TargetType="Button" x:Key="inputButton">
+            <Style.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Style.Resources>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <Border Style="{StaticResource taskPanelBorder}">
@@ -43,18 +55,15 @@
                     <ItemsControl ItemsSource="{Binding NodeItem.Inputs}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="Gray" Width="50" Height="50" Margin="2">
-                                    <Border.Background>
-                                        <SolidColorBrush Color="LightGray"/>
-                                    </Border.Background>
-                                    <Button Content="{Binding Path=Name}" Command="{Binding Path=DataContext.SetInputValueCommand,
+                                <Button Content="{Binding Path=Name}" 
+                                        Command="{Binding Path=DataContext.SetInputValueCommand,
                                             RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            CommandParameter="{Binding}">
-                                        <Button.ToolTip>
-                                            <TextBlock Text="{Binding Path=ValueType.FullName}"/>
-                                        </Button.ToolTip>
-                                    </Button>
-                                </Border>
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource inputButton}">
+                                    <Button.ToolTip>
+                                        <TextBlock Text="{Binding Path=ValueType.FullName}"/>
+                                    </Button.ToolTip>
+                                </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                         <ItemsControl.Style>

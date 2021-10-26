@@ -14,14 +14,18 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
 using VisualCoder.API;
 using VisualCoder.Program.Models;
+using VisualCoder.Program.Services;
 using VisualCoder.Program.Views.Components;
 
 namespace VisualCoder.Program.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
+        private readonly NodesService _nodesService;
 
         public VisualCoderData Context { get; private set; }
         public ObservableCollection<NodeItem> AllNodes { get; set; } = new ObservableCollection<NodeItem>();
@@ -99,6 +103,9 @@ namespace VisualCoder.Program.ViewModels
         public MainWindowViewModel()
         {
             Context = new VisualCoderData();
+
+            _nodesService = new NodesService(Context);
+
             AddNodeViewToPanelCommand = new DelegateCommand<object> (AddNodeViewToPanel);
 
             ExecuteCodeCommand = new DelegateCommand(ExecuteCode);
@@ -122,7 +129,7 @@ namespace VisualCoder.Program.ViewModels
 
                         string classPath = nodeInfo.PathExecuteClass;
 
-                        var node = LoadNode(assemlyPath, classPath, nodeInfo);
+                        var node = _nodesService.LoadNode(assemlyPath, classPath, nodeInfo);
 
                         AllNodes.Add(node);
                     }
@@ -130,28 +137,7 @@ namespace VisualCoder.Program.ViewModels
             }
         }
 
-        
-
-        private NodeItem LoadNode(string assemlyPath, string classPath, NodeInfo nodeInfo)
-        {
-            Assembly assembly = Assembly.LoadFrom(assemlyPath);
-            Type myType = assembly.GetType(classPath);
-
-            var attr = myType.GetCustomAttribute(typeof(NodeIdentificationAttribute)) as NodeIdentificationAttribute;
-            nodeInfo.NodeName = attr.NodeName;
-
-            ConstructorInfo info = myType.GetConstructor(Array.Empty<Type>());
-
-            object myObj = info.Invoke(Array.Empty<object>());
-
-            INode node = (INode)myObj;
-
-            NodeItem nodeResult = new NodeItem(nodeInfo, node, Context);
-
-            return nodeResult;
-        }
-
-        
+               
 
         private void AddNodeViewToPanel(object canvasObj)
         {
@@ -245,6 +231,19 @@ namespace VisualCoder.Program.ViewModels
             var lastNode = AllPlacedViewNodes.FirstOrDefault();
             lastNode.Node.Command.Execute();
             MessageBox.Show(lastNode.Node.Result.Value.ToString());
+        }
+
+        private Line CreateLine(Point start, Point end)
+        {
+            Line newLine = new Line();
+
+            newLine.X1 = start.X;
+            newLine.Y1 = start.Y;
+
+            newLine.X2 = end.X;
+            newLine.Y2 = end.Y;
+
+            return newLine;
         }
     }
 }
